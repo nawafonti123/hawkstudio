@@ -24,9 +24,16 @@ class Database:
         self.user = os.getenv('DB_USER', 'root')
         self.password = os.getenv('DB_PASSWORD', '')
         self.database = os.getenv('DB_NAME', 'hawkstudio_db')
-        self.port = os.getenv('DB_PORT', '3306')
+
+        # ✅ تحويل مباشر وآمن
+        try:
+            self.port = int(os.getenv('DB_PORT', 3306))
+        except ValueError:
+            self.port = 3306
+
         self.pool = None
         self._init_pool()
+
     
     def _init_pool(self):
         """تهيئة Connection Pool"""
@@ -444,6 +451,9 @@ class Database:
 
 # إنشاء كائن قاعدة بيانات عالمي
 db = Database()
+
+
+
 
 # ============================================================================
 # تطبيق Flask
@@ -1358,9 +1368,8 @@ def handle_exception(e):
 
 if __name__ == '__main__':
     print("🚀 بدء إعداد قاعدة البيانات...")
-    if not db.setup_database():
-        print("❌ فشل في إعداد قاعدة البيانات!")
-        exit(1)
+    if os.getenv("RENDER") != "true":
+        db.setup_database()
     
     print("\n✅ تم إعداد قاعدة البيانات بنجاح!")
     print("\n🌐 معلومات تشغيل السيرفر:")
